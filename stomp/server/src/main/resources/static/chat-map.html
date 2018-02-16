@@ -1,0 +1,144 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  		<meta name="HandheldFriendly" content="true" />
+	
+	    <title>Chat WebSocket</title>
+	    
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.0.1/ol.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	    
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.10/proj4.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.0.1/ol.js"></script>
+   
+	    <script src="/js/sockjs.min.js"></script>
+	    <script src="/js/stomp.min.js"></script>
+	    
+	    <script type="text/javascript">
+	    
+	        var stompClient = null;
+	        
+	        function setConnected(connected) {
+	        	
+	            document.getElementById('connect').disabled = connected;
+	            document.getElementById('disconnect').disabled = !connected;
+	            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
+	            document.getElementById('response').innerHTML = '';
+	        }
+	        
+	        function connect() {
+	        	
+				var socket = new SockJS('/ws');
+	            stompClient = Stomp.over(socket);  
+	            
+	            stompClient.connect({}, function(frame) {
+	                
+	            	setConnected(true);
+	                console.log('Connected: ' + frame);
+	                stompClient.subscribe('/topic/messages', function(messageOutput) {
+	                	
+	                    showMessageOutput(JSON.parse(messageOutput.body));
+	                });
+	            });
+	        }
+	        
+	        function disconnect() {
+	        	
+	            if(stompClient != null) {
+	                stompClient.disconnect();
+	            }
+	            
+	            setConnected(false);
+	            console.log("Disconnected");
+	        }
+	        
+	        function sendMessage() {
+	       
+	        		var from = document.getElementById('from').value;
+	            var text = document.getElementById('text').value;
+	            stompClient.send("/app/chat", {}, JSON.stringify({'sender':from, 'content':text, 'type': 'CHAT'}));
+	        }
+	        
+			function showMessageOutput(messageOutput) {
+	        	
+	            var response = document.getElementById('response');
+	            var p = document.createElement('p');
+	            p.style.wordWrap = 'break-word';
+	            p.appendChild(document.createTextNode(messageOutput.sender + ": " + messageOutput.content + " (" + "add timestamp here" + ")"));
+	            response.appendChild(p);
+	        }
+	    </script>
+	    
+	</head>
+	
+	<body onload="disconnect()">
+
+		<div id="map" style="width:400px;height:300px;"></div>
+
+		<div>
+			<div>
+				<input type="text" id="from" placeholder="Choose a nickname"/>
+			</div>
+			<br />
+		    <div>
+		        <button id="connect" onclick="connect();">Connect</button>
+		        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+		    </div>
+		    <br />
+		    <div id="conversationDiv">
+		        <input type="text" id="text" placeholder="Write a message..."/>
+		        <button id="sendMessage" onclick="sendMessage();">Send</button>
+		        <p id="response"></p>
+		    </div>
+		</div>
+
+
+	    <script type="text/javascript">
+			if (proj4) {
+		        proj4.defs("EPSG:2056", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs");
+		    }
+		    
+		    var projection = ol.proj.get('EPSG:2056');
+		    
+		    // We have to set the extent!
+		    projection.setExtent([2420000, 130000, 2900000, 1350000]);
+		    var projectionExtent = projection.getExtent();
+		    var viewExtent = [2570000,1208000, 2667000,1268000];
+
+		    var layers = [
+		        new ol.layer.Image({
+		            extent: viewExtent,
+		            //minResolution: 10.58333332800380,
+		            source: new ol.source.ImageWMS({
+	                    url: 'http://geoweb.so.ch/wms/sogis_orthofoto.wms',
+	                    params: {'LAYERS': 'Ortho_SO', 'FORMAT': 'image/jpeg', 'TRANSPARENT': 'false'},
+	                    ratio: 1.5
+		            })
+		        })     
+		    ];
+
+		    var map = new ol.Map({
+		        controls: ol.control.defaults().extend([
+		            new ol.control.ScaleLine()
+		        ]),
+
+		        units: 'm',
+		        logo: false,
+		        target: document.getElementById('map'),
+		        layers: layers,
+		        view: new ol.View({
+		            projection: projection,
+		            center: [2618000, 1236700],
+		            zoom: 1,
+		            //resolutions: [4000, 2000, 1000, 500, 250, 100, 50, 20, 10, 5, 2.5, 1, 0.5, 0.25, 0.1, 0.05] // eCH-0056
+		            resolutions: [132.29166659990700, 79.37499995994430, 52.91666663996280, 39.68749997997210, 26.45833331998140, 19.84374999000010, 13.22916665999070, 10.58333332800380, 7.93749999598883, 6.61458333000935, 5.29166666400188, 3.96874999799441, 3.30729166499068, 2.64583333219974, 1.98437499989881, 1.32291666659827, 0.79374999959888, 0.66145833330054, 0.52916666669979, 0.39687499979944, 0.26458333329977, 0.19843749990000, 0.13229166669987, 0.07937499989997, 0.06614583330009, 0.05291666659998, 0.03968749989986, 0.02645833329999, 0.01322916670000] // Kt. Zug (nice scales) + some more
+		        })
+		    });
+
+	    </script>
+
+
+	</body>
+</html>
