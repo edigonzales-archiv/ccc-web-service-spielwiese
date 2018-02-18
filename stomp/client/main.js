@@ -1,30 +1,47 @@
 var Stomp = require('@stomp/stompjs');
 
 var url = "ws://localhost:8080/ws";
-var client = Stomp.client(url);
+var stompClient = Stomp.client(url);
 
-/*
-client.connect( "", "", function(frame) {
+function connect() {
 
-    // once connected...
-    console.log("fubar");
-})
-*/
+    var headers = {
+        login: 'mylogin',
+        passcode: 'mypasscode',
+        // additional header
+        'client-id': 'my-client-id'
+    };  
+    stompClient.connect(headers, onConnected, onError);
+}
 
-var connect_callback = function(frame) {
-    // called back after the client is connected and authenticated to the STOMP server
+function onConnected() {
     console.log("connected");
-};
 
-var error_callback = function(frame) {
-    // called back after the client is connected and authenticated to the STOMP server
-    console.log("error. not connected.");
-};
-
-client.connect("", "", connect_callback, error_callback);
+    stompClient.subscribe('/user/queue/reply', onMessageReceived);
+    console.log("subscribed")
 
 
+    var chatMessage = {
+        sender: "stefan",
+        content: "Ich bin die Nachricht.",
+        type: 'CHAT'
+    };
+    stompClient.send("/app/fubar", {token: '2b4ae06e-14ce-11e8-b642-0ed5f89f718b'}, JSON.stringify(chatMessage));
+    console.log("gesendet")
+}
 
+function onError(error) {
+    console.log("error: ");
+    console.log(error);
+}
+
+function onMessageReceived(payload) {
+    console.log("message received");
+    console.log(payload);
+}
+
+
+connect();
 
 
 console.log("Hello, World!");

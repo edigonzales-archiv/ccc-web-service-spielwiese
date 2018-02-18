@@ -34,4 +34,23 @@ public class ChatController {
     public ChatMessage send(@Payload ChatMessage chatMessage) throws Exception {
     		return chatMessage;
     }
+    
+    @MessageMapping("/fubar")
+    @SendTo("/user/queue/reply")
+    public ChatMessage fubar(@Payload ChatMessage chatMessage, 
+                               SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session
+        //headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+    	
+    	
+		System.out.println(chatMessage.toString());
+		//System.out.println(headerAccessor.getHeader("token"));  
+		System.out.println(headerAccessor.toNativeHeaderMap().toString());  
+		System.out.println(headerAccessor.toMessageHeaders().toString());  
+		//System.out.println(headerAccessor.getUser(headers));
+    	
+        return chatMessage;
+    }
+    
+    
 }
