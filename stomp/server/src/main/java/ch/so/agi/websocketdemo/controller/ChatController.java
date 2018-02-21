@@ -5,6 +5,7 @@ import ch.so.agi.websocketdemo.model.ChatMessage.MessageType;
 
 import java.text.SimpleDateFormat;
 
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -37,12 +38,14 @@ public class ChatController {
     
     @MessageMapping("/fubar")
     @SendTo("/user/queue/reply")
-    public ChatMessage fubar(@Payload ChatMessage chatMessage, 
+    public ChatMessage fubar(Message<Object> message, @Payload ChatMessage chatMessage, 
                                SimpMessageHeaderAccessor headerAccessor) {
         // Add username in web socket session
         //headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
     	
-    	
+    		System.out.println(message.getHeaders());
+    		System.out.println(SimpMessageHeaderAccessor.USER_HEADER);
+    		
 		System.out.println(chatMessage.toString());
 		//System.out.println(headerAccessor.getHeader("token"));  
 		System.out.println(headerAccessor.toNativeHeaderMap().toString());  

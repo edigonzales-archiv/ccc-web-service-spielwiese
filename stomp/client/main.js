@@ -11,7 +11,7 @@ function connect() {
         // additional header
         'client-id': 'my-client-id'
     };  
-    stompClient.connect(headers, onConnected, onError);
+    stompClient.connect("stefan", "Ziegler", onConnected, onError);
 }
 
 function onConnected() {
@@ -27,7 +27,7 @@ function onConnected() {
         type: 'CHAT'
     };
     stompClient.send("/app/fubar", {token: '2b4ae06e-14ce-11e8-b642-0ed5f89f718b'}, JSON.stringify(chatMessage));
-    console.log("gesendet")
+    console.log("message gesendet")
 }
 
 function onError(error) {
