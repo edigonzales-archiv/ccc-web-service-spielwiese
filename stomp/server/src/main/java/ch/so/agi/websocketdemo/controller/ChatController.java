@@ -62,6 +62,8 @@ public class ChatController {
 		
 		simpMessagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/channel_pro_verheiratung", chatMessage);
 		
+		// eventuell ohne user? nur via token im header oder so.
+		//simpMessagingTemplate.convertAndSend(destination, payload);
         return chatMessage;
     }
     
