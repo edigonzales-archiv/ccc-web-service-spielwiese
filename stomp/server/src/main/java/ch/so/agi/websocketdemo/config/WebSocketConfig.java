@@ -3,6 +3,7 @@ package ch.so.agi.websocketdemo.config;
 import java.security.Principal;
 import java.util.Map;
 
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -14,7 +15,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
@@ -34,27 +34,29 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic", "/queue");
     }
     
-//    @SuppressWarnings("deprecation")
-//	@Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.setInterceptors(new ChannelInterceptorAdapter() {
-//            @Override
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//                StompHeaderAccessor accessor =
-//                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-//                
-//                System.out.println(accessor.toString());
-//                
-//                
-//                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-//
-//                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("stefan", "fubar");
-//                    accessor.setUser(auth);
-//                }
-//                return message;
-//            }
-//        });
-//    }
+    @SuppressWarnings("deprecation")
+	@Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.setInterceptors(new ChannelInterceptorAdapter() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor =
+                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                
+                System.out.println(accessor.toString());
+                
+                
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+
+                    //UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("stefan", "fubar");
+                   
+                		Principal auth = new GenericPrincipal("stefan", "ziegler", null);
+                		accessor.setUser(auth);
+                }
+                return message;
+            }
+        });
+    }
     
     
     public class MyHandshakeHandler extends DefaultHandshakeHandler {

@@ -11,13 +11,13 @@ function connect() {
         // additional header
         'client-id': 'my-client-id'
     };  
-    stompClient.connect("stefan", "Ziegler", onConnected, onError);
+    stompClient.connect("stefan", "ziegler", onConnected, onError);
 }
 
 function onConnected() {
     console.log("connected");
 
-    stompClient.subscribe('/user/queue/reply', onMessageReceived);
+    stompClient.subscribe('/user/queue/channel_pro_verheiratung', onMessageReceived);
     console.log("subscribed")
 
 
