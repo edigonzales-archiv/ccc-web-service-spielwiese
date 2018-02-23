@@ -1,16 +1,16 @@
 package ch.so.agi.ccc.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import ch.so.agi.ccc.model.CccMessage;
@@ -18,9 +18,11 @@ import ch.so.agi.ccc.model.Greeting;
 import ch.so.agi.ccc.model.HelloMessage;
 
 @Controller
-public class GreetingController {
+public class MainController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
@@ -29,23 +31,21 @@ public class GreetingController {
         return new Greeting("Hello, " + message.getName() + "!");
     }
     
-    // One @MessageMapping for every application (= app & gis) using ccc.
-    // You can grab @MessageMapping from the message header.
-    @MessageMapping("/generic")
-    @SendTo("/topic/greetings")
-    public Greeting receiveMessage(@Payload CccMessage message, SimpMessageHeaderAccessor headerAccessor) throws Exception {
+    // Jede Fachapplikation-WebGIS-Kombination erhält einen eigenen
+    // Endpunkt (=@MessageMapping), damit die Requests etc. einer  
+    // Kombination zugeordnet werden kann.
+    @MessageMapping({"/generic", "/baugk-afu"})
+    public void receiveMessage(@Payload CccMessage message, SimpMessageHeaderAccessor headerAccessor) throws Exception {
     		MessageHeaders messageHeaders = headerAccessor.getMessageHeaders();
-    		Map nativeHeaders = (Map) messageHeaders.get("nativeHeaders");
+    		//Map nativeHeaders = (Map) messageHeaders.get("nativeHeaders");
     	
-    		// Which application send the message?
-    		log.info("Application sent the message: " + nativeHeaders.get("destination").toString());
-    	
+    		String destination = (String) headerAccessor.getMessageHeaders().get("simpDestination");
+    		log.info("Requested endpoint: " + destination);
     		log.info(headerAccessor.getMessageHeaders().toString());
+    		
+    		String sessionId = message.getSessionId();
     	
-    	
-    	
-        Thread.sleep(1000); // simulated delay
-        return new Greeting("Hello, " + message.getApiVersion() + "!");
+        Thread.sleep(250); // simulated delay
+		simpMessagingTemplate.convertAndSend("/queue/ccci_" + sessionId, new Greeting("Hello, " + message.getSessionId() + " | " + message.getSender()));
     }
-
 }

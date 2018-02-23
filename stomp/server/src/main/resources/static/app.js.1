@@ -13,22 +13,16 @@ function setConnected(connected) {
 }
 
 function connect() {
-	var client = $("#client").val();
-	//console.log(client);
-	
-	var sessionId = $("#sessionid").val();
-	//console.log(sessionId);
-	
-	
+    //var socket = new SockJS('/ccc'); // ws://localhost:8080/ccc
+	//stompClient = Stomp.over(socket);
+
 	stompClient = Stomp.client('ws://localhost:8080/ccc/register'); // TODO: Avoid url, port & server context if client code is in the same server.
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        
-        var headers = {'sessionId': sessionId, 'client': client};
-        stompClient.subscribe('/queue/ccci_' + sessionId, function (greeting) {
+        stompClient.subscribe('/topic/greetings', function (greeting) {
             showGreeting(JSON.parse(greeting.body).content);
-        }, headers);
+        });
     });
 }
 
@@ -41,14 +35,14 @@ function disconnect() {
 }
 
 function sendName() {
-	var client = $("#client").val();
-	var sessionId = $("#sessionid").val();
 	
-	var application = $("#application").val();
-	var message = $("#message").val();
-			
-    var headers = {'sessionId': sessionId, 'client': client};
-    stompClient.send("/app/" + application, headers, message);
+	console.log($("#linkage-uuid").val());
+	console.log($("#message").val());
+		
+	//return;
+    //stompClient.send("/app/generic", {}, JSON.stringify({'name': $("#name").val()}));
+	
+    stompClient.send("/app/generic", {}, $("#message").val());
 }
 
 function showGreeting(message) {

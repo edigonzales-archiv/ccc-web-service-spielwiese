@@ -4,6 +4,8 @@ public class CccMessage {
 	
 	private String apiVersion;
 	
+	private String sessionId;
+	
 	private String sender;
 
 	public String getApiVersion() {
@@ -20,5 +22,13 @@ public class CccMessage {
 
 	public void setSender(String sender) {
 		this.sender = sender;
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 }
