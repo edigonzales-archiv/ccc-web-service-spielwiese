@@ -26,8 +26,9 @@ function connect() {
         console.log('Connected: ' + frame);
         
         var headers = {'sessionId': sessionId, 'client': client};
-        stompClient.subscribe('/queue/ccci_' + sessionId, function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
+        stompClient.subscribe('/queue/ccc_' + sessionId, function (greeting) {
+            //showCccResponse(JSON.parse(greeting.body).content);
+        		showCccResponse(greeting.body);
         }, headers);
     });
 }
@@ -40,7 +41,7 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
+function sendCccMessage() {
 	var client = $("#client").val();
 	var sessionId = $("#sessionid").val();
 	
@@ -51,7 +52,7 @@ function sendName() {
     stompClient.send("/app/" + application, headers, message);
 }
 
-function showGreeting(message) {
+function showCccResponse(message) {
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
 }
 
@@ -61,6 +62,6 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { sendCccMessage(); });
 });
 

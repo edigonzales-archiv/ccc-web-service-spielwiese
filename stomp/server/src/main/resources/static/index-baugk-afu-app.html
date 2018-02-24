@@ -17,37 +17,38 @@
 	</noscript>
 	<div id="main-content" class="container">
 		<div class="row">
-				<form>
-					<div class="form-group">
-						<label for="connect">WebSocket connection:</label>
-						<button id="connect" class="btn btn-default" type="submit">Connect</button>
-						<button id="disconnect" class="btn btn-default" type="submit"
-							disabled="disabled">Disconnect</button>
-					</div>
-				</form>
+			<form>
+				<div class="form-group">
+					<label for="connect">WebSocket connection:</label>
+					<button id="connect" class="btn btn-default" type="submit">Connect</button>
+					<button id="disconnect" class="btn btn-default" type="submit"
+						disabled="disabled">Disconnect</button>
+				</div>
+			</form>
 		</div>
 		<div class="row">&nbsp;</div>
 		<div class="row">
-		
-				<form>
-					<div class="form-group">
-						<label for="application">Application (used in app.js):</label> <input type="text" readonly
-							id="application" class="form-control" value="baugk-afu">
-					</div>
-					<div class="form-group">
-						<label for="client">Client (used in app.js):</label> <input type="text" readonly
-							id="client" class="form-control" value="app">
-					</div>
-					<div class="form-group">
-						<label for="sessionid">Session ID (used in app.js):</label> <input type="text" readonly
-							id="sessionid" class="form-control" value="7bbb0846-17ec-11e8-accf-0ed5f89f718b">
-					</div>
-					<div class="form-group">
-						<label for="message">Message:</label> <textarea rows="5"
-							id="message" class="form-control">{"apiVersion": 1.0, "sessionId": "7bbb0846-17ec-11e8-accf-0ed5f89f718b", "sender": "app"}</textarea>
-					</div>
-					<button id="send" class="btn btn-default" type="submit">Send</button>
-				</form>
+
+			<form>
+				<div class="form-group">
+					<label for="application">Application:</label> <input type="text"
+						readonly id="application" class="form-control" value="baugk-afu">
+				</div>
+				<div class="form-group">
+					<label for="client">Client (used in header):</label> <input
+						type="text" readonly id="client" class="form-control" value="app">
+				</div>
+				<div class="form-group">
+					<label for="sessionid">Session ID (used in header):</label> <input
+						type="text" id="sessionid" class="form-control"
+						value="7bbb0846-17ec-11e8-accf-0ed5f89f718b">
+				</div>
+				<div class="form-group">
+					<label for="message">Message:</label>
+					<textarea rows="5" id="message" class="form-control">{"apiVersion": 1.0, "context": "CH493287040689", "method": "edit"}</textarea>
+				</div>
+				<button id="send" class="btn btn-default" type="submit">Send</button>
+			</form>
 
 
 			<div class="row">
